@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="dataVisualization.css">
+</head>
+
+<body>
+    <!-- <div> -->
+        <select id="seasons" name="seasons" data-placeholder="Select seasons" multiple data-multi-select></select>
+        <button id="loadRunsBySeasons" >Filter anwenden</button>
+        <input type="text" id="filterInput" placeholder="'1'!nl&'2'false">
+
+    <!-- </div> -->
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Startzeit</th>
+                <th>Domain</th>
+                <th>Drachme</th>
+                <th>Startpferde</th>
+                <th>Gewinnwahrscheinlichkeit</th>
+                <th>Boss geschafft</th>
+                <th>Letzter Raum</th>
+                <th>Fragmente</th>
+            </tr>
+        </thead>
+        <tbody id="myTableBody">
+
+        </tbody>
+    </table>
+    <script src="MultiSelect.js"></script>
+    <script src="../jquery.js"></script>
+    <script src="dataVisualization.js"></script>
+</body>
+
+</html>

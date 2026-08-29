@@ -1,0 +1,21 @@
+.body {
+    display: flex;
+  }
+h3{
+    margin-left: 20px;
+}
+  
+  .sidebar {
+    width: 250px;
+    background-color: lightgrey;
+    position: fixed;
+    height: 100%;
+  }
+  
+  .content {
+    margin-left: 250px;
+    padding: 20px;
+  }
+  #delete{
+    margin-left: 20px;
+  }

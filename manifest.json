@@ -1,0 +1,38 @@
+{
+    "name": "Howrse Hades Tracker",
+    "version": "0",
+    "description": "write statistics to csv",
+    "icons": {
+        "16": "app/icons/icon128.jpg",
+        "48": "app/icons/icon128.jpg",
+        "128": "app/icons/icon128.jpg"
+    },
+    "manifest_version": 3,
+    "permissions": [
+        "pageCapture",
+        "unlimitedStorage",
+        "storage",
+        "downloads",
+        "offscreen"
+    ],
+    "options_page": "app/settings/settings.html",
+    "action": {
+        "default_title": "Chrome Addon v3 Starter",
+        "default_popup": "app/popup/popup.html",
+        "default_icon": {
+            "16": "app/icons/icon16.png",
+            "48": "app/icons/icon128.jpg",
+            "128": "app/icons/icon128.png"
+        }
+    },
+    "background": {
+        "service_worker": "app/background.js"
+    },
+    "content_scripts": [{
+        "js": ["app/jquery.js", "app/detailedLogging.js", "app/extract.js", "app/rememberme.js"],
+        "matches": ["https://www.howrse.com/rowgue/*", "https://www.howrse.de/rowgue/*", "https://www.howrse.se/rowgue/*", "https://www.howrse.co.uk/rowgue/*", "https://nl.howrse.com/rowgue/*", "https://au.howrse.com/rowgue/*","https://www.preprod.howrse.de/rowgue/*"]//https://www.howrse.com/rowgue/run
+        //"run_at":    "document_end"
+        //"world": "MAIN"
+    }]
+    
+}

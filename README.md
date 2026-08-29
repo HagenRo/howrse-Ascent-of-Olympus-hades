@@ -1,0 +1,1 @@
+# howrse-browser-extension

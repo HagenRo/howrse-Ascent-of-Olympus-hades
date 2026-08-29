@@ -1,0 +1,4 @@
+
+Knowne issus:
+- Run started in another browser will not know if it is drachma or not and the last setting will be used
+
