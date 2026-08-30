@@ -77,7 +77,8 @@ function getRewards() {
         dateRunStarted = new Date(timeStamp.getTime() - 10 * 60000);
         window.localStorage.setItem("dateRunStarted", dateRunStarted);//domain dependent when in content_script
     }
-    let htmlRewardBox = document.getElementsByClassName("block__content");
+    const root = document.getElementById('js-bonuses');
+    const htmlRewardBox = root.querySelectorAll('.block__content');
     for (let index = 0; index < 3; index++) {
         if (htmlRewardBox[index].children[2].tagName.toLowerCase() == "article") {
             let className = htmlRewardBox[index].children[2].className;
@@ -316,7 +317,7 @@ $('body').on('click', function () {//
         let lastRoom = window.localStorage.getItem("lastRoom");//domain dependent when in content_script
         lastRoom = (lastRoom ? lastRoom : "Error with lastRoom")
 
-        let con1 = document.getElementsByClassName("block__content").length > 3;
+        let con1 = document.getElementById("js-bonuses");
 
         //rewards
         let isDrachma = ('true' === window.localStorage.getItem('drachma'));

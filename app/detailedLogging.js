@@ -458,7 +458,7 @@ $(document).on('click', '.rgproba__btn.btn--primary.btn', function () {
     let threshold;
     //let promis = Promise.resolve();
     let rewardsForLog;
-    if (skillA == '22') {
+    if (skillA != '0' && skillB != '0' && skillC != '0' && skillD != '0') {
         [room, difficulty] = ['boss', 'difficulty4'];
         threshold = 'boss';
         rewardsForLog = new RewardsForLog(threshold, room, difficulty, undefined, fragments, horse);
@@ -482,7 +482,7 @@ $(document).on('click', '.rgproba__btn.btn--primary.btn', function () {
         arraySelectedHorseIds[index] = element.getAttribute('data-cardid');
     }
     let fight = new Fight(room, difficulty, threshold, skillA, skillB, skillC, skillD, winrate, arraySelectedHorseIds);
-    if (skillA == '22') {
+    if (skillA != '0' && skillB != '0' && skillC != '0' && skillD != '0') {
         /*
         *new Datamanagment
         */
