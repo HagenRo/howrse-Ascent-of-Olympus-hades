@@ -2,6 +2,7 @@ importScripts("Datamanagement.js");
 importScripts("dataprocessing.js");
 const dataAccessForOlympRuns = new DataAccessForOlympRuns();
 const dataAccessForSeasons = new DataAccessForSeasons();
+//test
 
 
 function formatData(data) {
