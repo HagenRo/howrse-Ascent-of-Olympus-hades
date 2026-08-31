@@ -270,7 +270,7 @@ $(document).on('mouseover', '.tooltip', function () {
 
 $(document).on('click', '.js-openRun', function () {
     let clickedBtnID = $(this.parentNode).attr('id');
-    chrome.tabs.create({ url: `app/dataVisualizationDB/fight.html#${clickedBtnID}`, active: true });
+    chrome.tabs.create({ url: `app/UI/dataVisualizationDB/fight.html#${clickedBtnID}`, active: true });
 })
 $(document).on('click', '#loadRunsBySeasons', function () {
     let selectetdSeasons = multiSelectSeasonsFromDB.selectedItems;

@@ -1,4 +1,4 @@
-
+//hier wird getrackt ob der obolus für den jeweiligen tag bereits eingesammelt wurde
 $(document).on('click', '.btn--primary.mt--2.btn', function (event) {
     function untilityGetLocationHost(){
         if ($('#privateMessage.disabled').length>0) {
@@ -14,9 +14,6 @@ $(document).on('click', '.btn--primary.mt--2.btn', function (event) {
 })
 
 
-/**Adds the given start horses to chrome.storage.local arrayOfStartHorses.
-@param {StartHorses} stratHorses - The start horses to be saved.
-@returns {void} */
 function saveObolusReceived(url, timeStamp) {
     chrome.storage.local.get(["obolusReceived"], function (keyValuePairs) {
         if (keyValuePairs.obolusReceived) {//if array exists
