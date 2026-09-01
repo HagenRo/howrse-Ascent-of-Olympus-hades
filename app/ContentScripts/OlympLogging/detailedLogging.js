@@ -360,7 +360,7 @@ class OL_Extractor {
         window.localStorage.setItem("OL_dateRunStarted", dateRunStarted);
 
         let isDrachma = $('.form__field__input[value="rowgue-special-ticket"]')?.get(0)?.checked;
-        let olympRun = new OlympRunLogging(dateRunStarted, untilityGetLocationHost(), isObolus ? isObolus==='false' : isDrachma);
+        let olympRun = new OlympRunLogging(dateRunStarted, untilityGetLocationHost(), isObolus ? isObolus === 'false' : isDrachma);
 
         chrome.runtime.sendMessage({ mdText: "addRunToDB", olympRun: olympRun }, (response) => {
             console.log(response);
@@ -416,34 +416,20 @@ class OL_Extractor {
     }
 
     static registerBossResultLogging() {
-        let firstTime = true;//REMOVE
-        $("body")[0].addEventListener('click', function (event) {//das ist der versuch mit mouseover damit die seite noch geladen ist und das content script noch existiert wenn das hier ausgeführt wird
+        $("body")[0].addEventListener('click', function (event) {
+            let isButton = $(event.target).closest('.js-rowgue__roomresult__btn[href="/rowgue/"]').length == 1 ? true : false;
+            if (isButton) {
+                let success = $('.alert--success').length;
+                let lose = $('.js-rowgue__roomresult--run-lost').length;
+                if (success == 1) {
+                    firstTime = false;
+                } else if (lose == 1) {
 
-            if (firstTime) {
-
-                let isButton = $(event.target).closest('.js-rowgue__roomresult__btn[href="/rowgue/"]').length == 1 ? true : false;
-                if (isButton) {
-                    let success = $('.alert--success').length;
-                    let lose = $('.js-rowgue__roomresult--run-lost').length;
-                    if (success == 1) {
-                        firstTime = false;
-                    } else if (lose == 1) {
-                        /*
-                        *new Datamanagment
-                        */
-                        dateRunStarted = window.localStorage.getItem('OL_dateRunStarted');
-                        chrome.runtime.sendMessage({ mdText: "addLostRunToBossRewards", dateRunStarted: dateRunStarted }, (response) => {
-                            console.log(response);
-                        });
-                        /*
-                        *end new Datamanagment
-                        */
-                        removeBossRewardFromLog();
-
-                        firstTime = false;
-                    }
+                    dateRunStarted = window.localStorage.getItem('OL_dateRunStarted');
+                    chrome.runtime.sendMessage({ mdText: "addLostRunToBossRewards", dateRunStarted: dateRunStarted }, (response) => {
+                        console.log(response);
+                    });
                 }
-
             }
         }, true)
     }
