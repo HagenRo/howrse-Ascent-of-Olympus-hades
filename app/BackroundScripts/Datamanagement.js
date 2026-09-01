@@ -520,6 +520,9 @@ class DataAccessForOlympRuns {
 
 /**
  * Class responsible for accessing season data in a database.
+ * jede season hat start und ensdatum, dass über ui vom benutzer definiert wird uhrzeit ist immer 14:00 
+ * zusätzlich als anzeigenamen hauptgottname, raritygott, startdatum, enddatum, pferd1, pferd2, pferd3, pferd4, rarity1, rarity2, rarity3, rarity4(für color coding)
+ * optional eine berechnung der season statistik hier zusätzlich ablegen???
  */
 class DataAccessForSeasons {
     /**
