@@ -34,27 +34,28 @@ class MultiSelectSeasonsFromDB {
         this.name = this.selectElement.getAttribute('name') ? this.selectElement.getAttribute('name') : 'multi-select-' + Math.floor(Math.random() * 1000000);
 
         this._getSeasonsFromDBAndFillAsOptionsData()
-        .then(() => {
-            console.log('Optionen wurden erfolgreich geladen und hinzugefügt.');
-            console.log(this.options.data)
-            if (!this.options.data.length) {
-                let options = this.selectElement.querySelectorAll('option');
-                for (let i = 0; i < options.length; i++) {
-                    this.options.data.push({
-                        value: options[i].value,
-                        text: options[i].innerHTML,
-                        selected: options[i].selected,
-                        html: options[i].getAttribute('data-html')
-                    });
+            .then(() => {
+                console.log('Optionen wurden erfolgreich geladen und hinzugefügt.');
+                console.log(this.options.data)
+                if (!this.options.data.length) {
+                    let options = this.selectElement.querySelectorAll('option');
+                    for (let i = 0; i < options.length; i++) {
+                        this.options.data.push({
+                            value: options[i].value,
+                            text: options[i].innerHTML,
+                            selected: options[i].selected,
+                            html: options[i].getAttribute('data-html')
+                        });
+                    }
                 }
-            }
-            this.element = this._template();
-            this.selectElement.replaceWith(this.element);
-            this._updateSelected();
-            this._eventHandlers();        })
-        .catch(err => {
-            console.error('Fehler beim Laden der Optionen: ', err);
-        });        
+                this.element = this._template();
+                this.selectElement.replaceWith(this.element);
+                this._updateSelected();
+                this._eventHandlers();
+            })
+            .catch(err => {
+                console.error('Fehler beim Laden der Optionen: ', err);
+            });
 
 
     }
@@ -136,13 +137,14 @@ class MultiSelectSeasonsFromDB {
                 if (this.options.max) {
                     this.element.querySelector('.multi-select-header-max').innerHTML = this.selectedValues.length + '/' + this.options.max;
                 }
-                if (this.options.search === true || this.options.search === 'true') {
-                    this.element.querySelector('.multi-select-search').value = '';
-                }
-                this.element.querySelectorAll('.multi-select-option').forEach(option => option.style.display = 'flex');
-                if (this.options.closeListOnItemSelect === true || this.options.closeListOnItemSelect === 'true') {
-                    headerElement.classList.remove('multi-select-header-active');
-                }
+                //beim anklicken einer option filter zurück setztzen auskommentiert
+                // if (this.options.search === true || this.options.search === 'true') {
+                //     this.element.querySelector('.multi-select-search').value = '';
+                // }
+                // this.element.querySelectorAll('.multi-select-option').forEach(option => option.style.display = 'flex');
+                // if (this.options.closeListOnItemSelect === true || this.options.closeListOnItemSelect === 'true') {
+                //     headerElement.classList.remove('multi-select-header-active');
+                // }
                 this.options.onChange(option.dataset.value, option.querySelector('.multi-select-option-text').innerHTML, option);
                 if (selected) {
                     this.options.onSelect(option.dataset.value, option.querySelector('.multi-select-option-text').innerHTML, option);
@@ -166,7 +168,7 @@ class MultiSelectSeasonsFromDB {
                 let allSelected = selectAllButton.classList.contains('multi-select-selected');
                 this.element.querySelectorAll('.multi-select-option').forEach(option => {
                     let dataItem = this.data.find(data => data.value == option.dataset.value);
-                    if (dataItem && ((allSelected && dataItem.selected) || (!allSelected && !dataItem.selected))) {
+                    if (option.style.display !== 'none' && dataItem && ((allSelected && dataItem.selected) || (!allSelected && !dataItem.selected))) {
                         option.click();
                     }
                 });
@@ -208,8 +210,8 @@ class MultiSelectSeasonsFromDB {
                     console.log('loadedSeasons: ', result);
                     result.forEach(season => {
                         this.options.data.push({
-                            value: season.seasonStartDate,
-                            text: season.seasonStartDateHumanReadable,
+                            value: season.startDate,
+                            text: this._seasonToHTML(season),
                             selected: false,
                             html: null
                         });
@@ -222,9 +224,59 @@ class MultiSelectSeasonsFromDB {
             });
         });
 
-        
+
     }
-    
+    _seasonToHTML(season) {
+        const rarityColors = {
+            common: "#af9c8c",
+            rare: "#25cda3",
+            precious: "#ee8c13",
+            devine: "#7c4d81",
+        };
+
+        const getRarityColor = rarity => {
+            return rarityColors[String(rarity).toLowerCase()] || "#ffffff";
+        };
+
+        const formatDate = timestamp => {
+            return new Intl.DateTimeFormat("de-DE", {
+                dateStyle: "medium"
+            }).format(new Date(timestamp));
+        };
+
+        return `
+        <div class="season-row">
+            <span>${formatDate(season.startDate)}</span>
+
+            <span>${season.mainGodDisplayName !== "" ? season.mainGodDisplayName : season.mainGodAltName}</span>
+
+            <span
+                style="background-color: ${getRarityColor(season.horseRarity1)}"
+            >
+                ${season.horseDisplayName1 !== "" ? season.horseDisplayName1 : season.horseAltName1}
+            </span>
+
+            <span
+                style="background-color: ${getRarityColor(season.horseRarity2)}"
+            >
+                ${season.horseDisplayName2 !== "" ? season.horseDisplayName2 : season.horseAltName2}
+            </span>
+
+            <span
+                style="background-color: ${getRarityColor(season.horseRarity3)}"
+            >
+                ${season.horseDisplayName3 !== "" ? season.horseDisplayName3 : season.horseAltName3}
+            </span>
+
+            <span
+                style="background-color: ${getRarityColor(season.horseRarity4)}"
+            >
+                ${season.horseDisplayName4 !== "" ? season.horseDisplayName4 : season.horseAltName4}
+            </span>
+        </div>
+    `;
+    }
+
 
     get selectedValues() {
         return this.data.filter(data => data.selected).map(data => data.value);

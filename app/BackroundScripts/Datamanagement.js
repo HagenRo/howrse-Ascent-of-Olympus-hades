@@ -53,17 +53,23 @@ class DatabaseConnection {
      * @returns {Promise<Object>} - A promise that resolves with a success message or rejects with an error message.
      */
     async insertOrErrorItem(item) {
+        console.log("insertOrErrorItem")
         return new Promise((resolve, reject) => {
+            console.log("trans")
             const transaction = this.db.transaction(this.storeName, 'readwrite');
+            console.log("store")
             const store = transaction.objectStore(this.storeName);
+            console.log("req")
             const request = store.add(item);
+            console.log("hä?")
 
             request.onsuccess = () => {
+                console.log("ioet suc")
                 resolve({msg: 'success'});
             };
 
             request.onerror = (event) => {
-                console.log(event);
+                console.log("ioet err" + event);
                 reject({msg: event.target.errorCode});
             };
         });
@@ -296,11 +302,13 @@ class Queue {
                     this.dequeue();
                 })
                 .catch(err => {
+                    console.log("1")
                     this.workingOnPromise = false;
                     item.reject(err);
                     this.dequeue();
                 })
         } catch (err) {
+            console.log("2")
             this.workingOnPromise = false;
             item.reject(err);
             this.dequeue();
@@ -523,6 +531,7 @@ class DataAccessForOlympRuns {
  * jede season hat start und ensdatum, dass über ui vom benutzer definiert wird uhrzeit ist immer 14:00 
  * zusätzlich als anzeigenamen hauptgottname, raritygott, startdatum, enddatum, pferd1, pferd2, pferd3, pferd4, rarity1, rarity2, rarity3, rarity4(für color coding)
  * optional eine berechnung der season statistik hier zusätzlich ablegen???
+ * 
  */
 class DataAccessForSeasons {
     /**
@@ -530,7 +539,7 @@ class DataAccessForSeasons {
      * Initializes the database connection and sets up the promise queue.
      */
     constructor() {
-        this.databaseConnection = new DatabaseConnection('OlympSeasons', 'Seasons', 'seasonStartDate');
+        this.databaseConnection = new DatabaseConnection('OlympSeasons', 'Seasons', 'startDate');
         this.promisQueue = Queue;
         console.log('DataAccessForSeasons: constructor')
         this.initDataAccessForSeasons();
@@ -553,6 +562,7 @@ class DataAccessForSeasons {
      * @returns {Promise} - A promise that resolves when the season has been added or rejects if there is an error.
      */
     addSeasonToDB(season) {
+        console.log(season);
 
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.insertOrErrorItem(season);

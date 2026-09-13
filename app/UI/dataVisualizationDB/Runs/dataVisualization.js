@@ -1,3 +1,104 @@
+class Season {
+    constructor({
+        mainGodAltName,
+        mainGodDisplayName,
+        godRarity,
+        seasonStartDate,
+        seasonStartTime,
+        seasonEndDate,
+        seasonEndTime,
+
+        horseAltName1,
+        horseAltName2,
+        horseAltName3,
+        horseAltName4,
+
+        horseDisplayName1,
+        horseDisplayName2,
+        horseDisplayName3,
+        horseDisplayName4,
+
+        horseRarity1,
+        horseRarity2,
+        horseRarity3,
+        horseRarity4
+    }) {
+        this.mainGodAltName = mainGodAltName;
+        this.mainGodDisplayName = mainGodDisplayName;
+        this.godRarity = godRarity;
+
+        this.startDate = new Date(seasonStartDate+"T"+seasonStartTime).getTime();
+
+        this.endDate = seasonEndDate === "" ? "" : new Date(seasonEndDate+"T"+seasonEndTime).getTime();
+
+        this.horseAltName1 = horseAltName1;
+        this.horseAltName2 = horseAltName2;
+        this.horseAltName3 = horseAltName3;
+        this.horseAltName4 = horseAltName4;
+
+        this.horseDisplayName1 = horseDisplayName1;
+        this.horseDisplayName2 = horseDisplayName2;
+        this.horseDisplayName3 = horseDisplayName3;
+        this.horseDisplayName4 = horseDisplayName4;
+
+        this.horseRarity1 = horseRarity1;
+        this.horseRarity2 = horseRarity2;
+        this.horseRarity3 = horseRarity3;
+        this.horseRarity4 = horseRarity4;
+    }
+    stringify() {
+        return JSON.stringify(this);
+    }
+}
+
+class UIInterface {
+    static registerLiveFilter() {
+        document.getElementById("filterInput").addEventListener("input", filterUIRuns);
+    }
+    static registerColumnSort() {
+        let header = document.querySelectorAll("th");
+
+        header.forEach(function (th, i) {
+            th.addEventListener('click', function () {
+                sortUIRuns(i);
+            });
+        });
+    }
+    static registerMousoverTooltip() {
+        $(document).on('mouseover', '.tooltip', function () {
+            let anzahlFragmente = 0;
+            let horse = $(this).attr('class').split(' ')[0];
+            let elements = document.getElementsByClassName(horse);
+            for (let index = 0; index < elements.length; index++) {
+                const element = elements[index];
+                if (element.parentNode.parentNode.style.display != 'none') {
+                    anzahlFragmente += Number(element.id);
+                }
+
+
+            }
+            $(this).find('span').text(anzahlFragmente);
+        })
+    }
+    static registerOpenRun() {
+        $(document).on('click', '.js-openRun', function () {
+            let clickedBtnID = $(this.parentNode).attr('id');
+            chrome.tabs.create({ url: `app/UI/dataVisualizationDB/fight.html#${clickedBtnID}`, active: true });
+        })
+    }
+    static registerLoadRunsBySeason() {
+        $(document).on('click', '#loadRunsBySeasons', function () {
+            let selectetdSeasons = multiSelectSeasonsFromDB.selectedItems;
+            console.log(selectetdSeasons);
+        })
+    }
+}
+UIInterface.registerLiveFilter();
+UIInterface.registerColumnSort();
+UIInterface.registerMousoverTooltip();
+UIInterface.registerOpenRun();
+UIInterface.registerLoadRunsBySeason();
+
 function filterUIRuns() {
     let uIRunFilters = [{//jeder Filter kann genau einen Filter einer art enthalten
         "columnIndex": null,//null um alle spalten zu durchsuchen
@@ -178,7 +279,6 @@ function calculateAverage() {
 
 }
 
-document.getElementById("filterInput").addEventListener("input", filterUIRuns);
 
 
 let g_collumToSort = 0;
@@ -199,42 +299,53 @@ function sortUIRuns(collumToSort) {
 
 }
 
-let header = document.querySelectorAll("th");
+class UIBackgroundCommunication {
+    static runs = [];
+    static registerChunkReciever() {
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.type === "data_chunk") {
+                console.log("Chunk empfangen:", UIBackgroundCommunication.runs);
 
-header.forEach(function (th, i) {
-    th.addEventListener('click', function () {
-        sortUIRuns(i);
-    });
-});
+                // Verarbeite den Chunk wie benötigt...
+                UIBackgroundCommunication.runs = UIBackgroundCommunication.runs.concat(request.data);
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === "data_chunk") {
-        console.log("Chunk empfangen:", g_result);
-        
-        // Verarbeite den Chunk wie benötigt...
-        g_result = g_result.concat(request.data);
-
-        // Bestätige den Empfang des Chunks
-        sendResponse({ msg: 'chunk_received' });
+                // Bestätige den Empfang des Chunks
+                sendResponse({ msg: 'chunk_received' });
+            }
+        });
     }
-});
-function loadRuns() {
-    console.log("am Anfang von loadRuns()");
-    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
-        console.log("loadRuns(), vor dem if",msg,result);
-        if (msg === 'success') {
-            //globalArrayOfRuns = result;
-            console.log("loadRuns(), msg === success, g_result:",g_result);
-            g_UIRuns = buildArrayOfUIRuns(g_result);
-            g_UIRuns.sort(sortUIRunsDesc);
-            console.log("loadRuns(), success",g_UIRuns);
-            buildTableForUIRuns(g_UIRuns);
-            calculateAverage();
-        } else {
-            console.log("loadRuns(), else",msg);
-        }
-    });
+
+    static loadRuns() {
+        console.log("am Anfang von loadRuns()");
+        chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
+            console.log("loadRuns(), vor dem if", msg, result);
+            if (msg === 'allChunksSend') {
+                //globalArrayOfRuns = result;
+                console.log("loadRuns(), msg === allChunksSend, UIBackgroundCommunication.runs:", UIBackgroundCommunication.runs);
+                g_UIRuns = buildArrayOfUIRuns(UIBackgroundCommunication.runs);
+                g_UIRuns.sort(sortUIRunsDesc);
+                console.log("loadRuns(), success", g_UIRuns);
+                buildTableForUIRuns(g_UIRuns);
+                calculateAverage();
+            } else {
+                console.log("loadRuns(), else", msg);
+            }
+        });
+    }
+    static exportRuns() {
+        chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
+            if (msg === 'allChunksSend') {
+                console.info(JSON.stringify(UIBackgroundCommunication.runs));
+            } else {
+                console.log(msg);
+            }
+
+        });
+    }
 }
+UIBackgroundCommunication.registerChunkReciever();
+UIBackgroundCommunication.loadRuns();
+
 
 function sortUIRunsAsc(a, b) {
     if (a[g_collumToSort].sortCriteria > b[g_collumToSort].sortCriteria)
@@ -247,35 +358,14 @@ function sortUIRunsDesc(a, b) {
     return sortUIRunsAsc(a, b) * -1;
 }
 
-let g_result = [];
 let globalArrayOfRuns = [];
 let g_UIRuns = [];
-loadRuns();
 //loadSeasons();
 
-$(document).on('mouseover', '.tooltip', function () {
-    let anzahlFragmente = 0;
-    let horse = $(this).attr('class').split(' ')[0];
-    let elements = document.getElementsByClassName(horse);
-    for (let index = 0; index < elements.length; index++) {
-        const element = elements[index];
-        if (element.parentNode.parentNode.style.display != 'none') {
-            anzahlFragmente += Number(element.id);
-        }
 
 
-    }
-    $(this).find('span').text(anzahlFragmente);
-})
 
-$(document).on('click', '.js-openRun', function () {
-    let clickedBtnID = $(this.parentNode).attr('id');
-    chrome.tabs.create({ url: `app/UI/dataVisualizationDB/fight.html#${clickedBtnID}`, active: true });
-})
-$(document).on('click', '#loadRunsBySeasons', function () {
-    let selectetdSeasons = multiSelectSeasonsFromDB.selectedItems;
-    console.log(selectetdSeasons);
-})
+
 
 
 function buildArrayOfUIRuns(runs) {
@@ -449,17 +539,7 @@ function buildTableForUIRuns(uIRuns) {
 
 }
 
-function exportRuns() {
-    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
-        if (msg === 'success') {
-            console.info(JSON.stringify(result));
-        } else {
-            console.log(msg);
-        }
-
-    });
-}
-
+//TODO: anpassen an neu definierte Season klasse
 function addSeasonToDB(startDateOfSeason) {
     let date = new Date(startDateOfSeason);
     let season = {
@@ -511,7 +591,7 @@ function compareVersions() {
                     runOrg = arrayOfRunsOrgVersion[orgIndex];
                 }
                 if (run.id == runOrg.dateRunStarted) {
-                    if (run[1].innerHTML == runOrg.domain && (run[6].innerHTML == runOrg.arrayOfFights.length-1 || run[6].innerHTML == runOrg.arrayOfFights.length && run[5].innerHTML == 'Ja' || runOrg.arrayOfFights.length == 0 && run[6].innerHTML == '-' )) {
+                    if (run[1].innerHTML == runOrg.domain && (run[6].innerHTML == runOrg.arrayOfFights.length - 1 || run[6].innerHTML == runOrg.arrayOfFights.length && run[5].innerHTML == 'Ja' || runOrg.arrayOfFights.length == 0 && run[6].innerHTML == '-')) {
                         document.getElementById(run.id).style.backgroundColor = 'green';
                     }
                     else {

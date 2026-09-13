@@ -1,0 +1,366 @@
+/* addSeason.css */
+
+/* Hintergrund des Popup-Fensters */
+.add-season-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px;
+
+    background: rgba(0, 0, 0, 0.65);
+}
+
+/* Popup */
+.add-season-modal {
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    width: 800px;
+    height: 550px;
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+
+    overflow: hidden;
+
+    background: #fff;
+    color: #212529;
+    border-radius: 8px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+}
+
+/* Kopfbereich */
+.add-season-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    flex: 0 0 auto;
+
+    padding: 8px 16px;
+
+    background: #c3c35b;
+    border-bottom: 1px solid #a5a54e;
+}
+
+.add-season-modal-title {
+    margin: 0;
+
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.add-season-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: transparent;
+    color: #222;
+
+    font-size: 25px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.add-season-modal-close:hover {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+/* Inhaltsbereich */
+.add-season-modal-body {
+    box-sizing: border-box;
+
+    flex: 1 1 auto;
+
+    overflow: hidden;
+
+    padding: 8px 14px;
+}
+
+/* Fehlermeldung */
+.add-season-error {
+    display: none;
+
+    margin-bottom: 5px;
+    padding: 5px 8px;
+
+    border: 1px solid #d9534f;
+    border-radius: 4px;
+
+    background: #fbe9e8;
+    color: #a94442;
+
+    font-size: 12px;
+}
+
+.add-season-error-visible {
+    display: block;
+}
+
+/* Bereiche */
+.add-season-section {
+    margin-bottom: 8px;
+    padding: 8px 10px;
+
+    border: 1px solid #d8d8d8;
+    border-radius: 5px;
+
+    background: #fafafa;
+}
+
+.add-season-section:last-child {
+    margin-bottom: 0;
+}
+
+.add-season-section-title {
+    margin: 0 0 0px;
+
+    color: #444;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* Allgemeines Grid für Saison und Hauptgott */
+.add-season-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 5px 8px;
+}
+
+/* Eingabefelder */
+.add-season-field {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+    justify-content: flex-start;
+
+    min-width: 0;
+}
+
+.add-season-field label {
+    display: flex;
+    align-items: center;
+
+    box-sizing: border-box;
+
+    height: 16px;
+    min-height: 16px;
+    margin: 0 0 2px;
+    padding: 0;
+
+    color: #333;
+
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 16px;
+}
+
+.add-season-field input,
+.add-season-field select {
+    display: block;
+
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 28px;
+    min-height: 28px;
+    max-height: 28px;
+    margin: 0;
+    padding: 3px 6px;
+
+    border: 1px solid #bfc4c9;
+    border-radius: 4px;
+
+    background: #fff;
+    color: #212529;
+
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 20px;
+
+    outline: none;
+}
+
+.add-season-field input:focus,
+.add-season-field select:focus {
+    border-color: #40a866;
+    box-shadow: 0 0 0 2px rgba(64, 201, 121, 0.18);
+}
+
+/* Browser-Verhalten für Dropdowns */
+.add-season-field select {
+    appearance: auto;
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+
+    cursor: pointer;
+}
+
+/* Pferdebereich */
+.add-season-grid-horses {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/*
+ * Ein Pferd pro Zeile.
+ *
+ * Spalten:
+ * 1. Pferd 1, Pferd 2, ...
+ * 2. Alternativer Name
+ * 3. Anzeigename
+ * 4. Seltenheit
+ */
+.add-season-horse-row {
+    display: grid;
+    grid-template-columns: 0.45fr 1.3fr 1.3fr 0.8fr;
+    align-items: end;
+
+    column-gap: 8px;
+    row-gap: 3px;
+
+    padding: 3px 6px;
+
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+
+    background: #fff;
+}
+
+.add-season-horse-title {
+    align-self: start;
+
+    margin: 26px 0 0;
+    padding-top: 0;
+
+    color: #555;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Fußbereich */
+.add-season-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    flex: 0 0 auto;
+
+    gap: 6px;
+    padding: 7px 14px;
+
+    border-top: 1px solid #d8d8d8;
+
+    background: #f4f4f4;
+}
+
+.add-season-button {
+    min-width: 115px;
+    padding: 6px 12px;
+
+    border: 1px solid transparent;
+    border-radius: 4px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.add-season-button-cancel {
+    border-color: #999;
+
+    background: #fff;
+    color: #333;
+}
+
+.add-season-button-cancel:hover {
+    background: #eee;
+}
+
+.add-season-button-save {
+    border-color: #319b5c;
+
+    background: #40c979;
+    color: #fff;
+}
+
+.add-season-button-save:hover {
+    background: #319b5c;
+
+
+}
+
+
+
+/* Grid für Saison und Hauptgott */
+.add-season-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 5px 8px;
+}
+
+/*
+ * Erste Zeile:
+ * 3 gleich große Felder
+ */
+.add-season-grid > .add-season-field:nth-child(1),
+.add-season-grid > .add-season-field:nth-child(2),
+.add-season-grid > .add-season-field:nth-child(3) {
+    grid-column: span 4;
+}
+
+/*
+ * Zweite Zeile:
+ * Groß – klein – groß – klein
+ *
+ * Startdatum  = groß
+ * Startzeit   = klein
+ * Enddatum    = groß
+ * Endzeit     = klein
+ */
+.add-season-grid > .add-season-field:nth-child(4) {
+    grid-column: span 4;
+}
+
+.add-season-grid > .add-season-field:nth-child(5) {
+    grid-column: span 2;
+}
+
+.add-season-grid > .add-season-field:nth-child(6) {
+    grid-column: span 4;
+}
+
+.add-season-grid > .add-season-field:nth-child(7) {
+    grid-column: span 2;
+}
+
+/* Kompakte Zeitfelder */
+#addSeason_seasonStartTime,
+#addSeason_seasonEndTime {
+    min-width: 0;
+    width: 100%;
+    padding-left: 3px;
+    padding-right: 3px;
+    font-size: 11px;
+}

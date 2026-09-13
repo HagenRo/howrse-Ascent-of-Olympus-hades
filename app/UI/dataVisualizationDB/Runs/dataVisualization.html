@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="dataVisualization.css">
+    <link rel="stylesheet" type="text/css" href="addSeasons.css">
+</head>
+
+<body>
+    <div class="season-toolbar">
+        <select id="seasons"
+                name="seasons"
+                data-placeholder="Select seasons"
+                multiple
+                data-multi-select
+                data-width="760px"
+                data-dropdown-width="760px">
+        </select>
+
+        <button id="loadRunsBySeasons">
+            Filter anwenden
+        </button>
+
+        <button id="addSeasonButton" type="button">
+            Add Season
+        </button>
+    </div>
+
+    <input type="text" id="filterInput" placeholder="'1'!nl&'2'false">
+
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Startzeit</th>
+                <th>Domain</th>
+                <th>Drachme</th>
+                <th>Startpferde</th>
+                <th>Gewinnwahrscheinlichkeit</th>
+                <th>Boss geschafft</th>
+                <th>Letzter Raum</th>
+                <th>Fragmente</th>
+            </tr>
+        </thead>
+        <tbody id="myTableBody">
+
+        </tbody>
+    </table>
+    <script src="MultiSelect.js"></script>
+    <script src="../../../jquery.js"></script>
+    <script src="dataVisualization.js"></script>
+    <script src="addSeasons.js"></script>
+</body>
+
+</html>

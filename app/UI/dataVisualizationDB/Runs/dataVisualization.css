@@ -1,3 +1,5 @@
+/* dataVisualization.css */
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -174,8 +176,8 @@ div{
     line-height: 20px;
   }
   .multi-select .multi-select-options .multi-select-option.multi-select-selected .multi-select-option-radio, .multi-select .multi-select-options .multi-select-all.multi-select-selected .multi-select-option-radio {
-    border-color: #40c979;
-    background-color: #40c979;
+    border-color: #4074c9;
+    background-color: #4074c9;
   }
   .multi-select .multi-select-options .multi-select-option.multi-select-selected .multi-select-option-radio::after, .multi-select .multi-select-options .multi-select-all.multi-select-selected .multi-select-option-radio::after {
     content: "";
@@ -187,9 +189,7 @@ div{
     border-width: 0 0.15em 0.15em 0;
     transform: rotate(45deg);
   }
-  .multi-select .multi-select-options .multi-select-option.multi-select-selected .multi-select-option-text, .multi-select .multi-select-options .multi-select-all.multi-select-selected .multi-select-option-text {
-    color: #40c979;
-  }
+
   .multi-select .multi-select-options .multi-select-option:hover, .multi-select .multi-select-options .multi-select-option:active, .multi-select .multi-select-options .multi-select-all:hover, .multi-select .multi-select-options .multi-select-all:active {
     background-color: #f3f4f7;
   }
@@ -224,3 +224,62 @@ div{
   }
 
   /* End Dropdown CSS */
+
+  .season-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 0;
+}
+
+/* Der von MultiSelect.js erzeugte Container */
+.season-toolbar .multi-select {
+    width: auto;
+    flex: 0 1 450px;
+    min-width: 220px;
+}
+
+/* Filter-Button bleibt direkt neben dem Multiselect */
+#loadRunsBySeasons {
+    flex: 0 0 auto;
+}
+
+/* Add-Season-Button wird ganz nach rechts geschoben */
+#addSeasonButton {
+    margin-left: auto;
+    flex: 0 0 auto;
+    margin-right: 20px;
+}
+
+/* Optional: Grundgestaltung der Buttons */
+.season-toolbar button {
+    padding: 8px 14px;
+    cursor: pointer;
+}
+
+
+
+
+.season-row {
+    display: grid;
+    align-items: center;
+    gap: 0;
+
+    /* Erste zwei Spalten individuell, die letzten vier gleich breit */
+    grid-template-columns:
+        85px   /* Startdatum */
+        120px   /* Gott */
+        repeat(4, 120px);
+}
+
+.season-row span {
+    min-width: 0;
+    margin-right: 2px;
+    border-radius: 3px;
+    padding-left: 3px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

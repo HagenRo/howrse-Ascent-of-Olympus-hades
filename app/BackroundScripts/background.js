@@ -173,6 +173,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                     sendResponse({ msg: msg, result: result });
                 })
                 .catch((e) => {
+                    console.log("err")
                     sendResponse({ msg: e });
                 });
             break;
@@ -348,7 +349,7 @@ function sendInChunks(data, sendResponse) {
                 if (index < data.length) {
                     sendNextChunk(); // Sende den nächsten Chunk
                 } else {
-                    sendResponse({ msg: "success" }); // Alle Chunks gesendet
+                    sendResponse({ msg: "allChunksSend" }); // Alle Chunks gesendet
                 }
             }
         });
