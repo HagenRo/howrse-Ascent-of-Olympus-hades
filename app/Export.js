@@ -5,7 +5,7 @@ class HowrseDataCompressor {
         horse: ['currentlevel', 'currentstamina', 'id', 'levelmax', 'name', 'rewardType', 'skilla', 'skillb', 'skillc', 'skilld'],
         fight: ['arraySelectedHorseIds', 'difficulty', 'room', 'skillA', 'skillB', 'skillC', 'skillD', 'threshold', 'winrate'],
 
-        rewardSet: ['arrayOfRewards', 'dificulty', 'fragments', 'horse', 'room', 'threshold'],
+        rewardSet: ['arrayOfRewards', 'dificulty', 'fragments', 'horse', 'room', 'threshold', 'lostRun'],
         horseReward: ['arrayOfTargetIds', 'currentlevel', 'currentstamina', 'id', 'levelmax', 'name', 'rewardType', 'skilla', 'skillb', 'skillc', 'skilld',],
         levelUpReward: ['arrayOfTargetIds', 'numberHorses', 'numberLevel', 'rewardType'],
         staminaReward: ['arrayOfTargetIds', 'numberHorses', 'numberStamina', 'rewardType'],
@@ -138,11 +138,16 @@ class HowrseDataCompressor {
                 value = value.map(item => this._decompressValue(item, 'horse'));
             }
 
-            //the boss reward has no arrayOfRewards
-            if (!(fieldName === 'arrayOfRewards' && value === null)) {
-                obj[fieldName] = value;
-
+            //füge lost run nur hinzu, wenn es im originalen datensatz existiert hat
+            if (fieldName === 'lostRun' && value === null) {
+                return;
             }
+
+            //the boss reward has no arrayOfRewards
+            if (fieldName === 'arrayOfRewards' && value === null) {
+                return
+            }
+            obj[fieldName] = value;
         });
 
         return obj;
