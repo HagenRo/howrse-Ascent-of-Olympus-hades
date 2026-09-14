@@ -202,7 +202,7 @@ function testEncodeDecode(obj) {
 
 class DictionaryCompressor {
     static marker = "|";
-    static defaultStringRegex = /"(?:\\.|[^"\\])*",?/g;
+    static defaultStringRegex = /"(?:\\.|[^"\\])*"/g;
 
     static compress(
         input,
