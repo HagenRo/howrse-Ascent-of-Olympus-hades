@@ -152,17 +152,7 @@ class HowrseDataCompressor {
 
 
 function testAll(){
-    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
-            if (msg === 'allChunksSend') {
-                UIBackgroundCommunication.runs = UIBackgroundCommunication.chunkedRuns;
-                UIBackgroundCommunication.chunkedRuns = [];
-
-                console.log(testEncodeDecode(UIBackgroundCommunication.runs));
-            } else {
-                console.log(msg);
-            }
-
-        });
+    console.log(testEncodeDecode(g_result));
 }
 
 function testEncodeDecode(obj) {
