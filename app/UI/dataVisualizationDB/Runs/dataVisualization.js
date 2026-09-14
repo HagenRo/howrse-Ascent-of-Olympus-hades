@@ -301,13 +301,12 @@ function sortUIRuns(collumToSort) {
 
 class UIBackgroundCommunication {
     static runs = [];
+    static chunkedRuns = [];
     static registerChunkReciever() {
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.type === "data_chunk") {
-                console.log("Chunk empfangen:", UIBackgroundCommunication.runs);
-
                 // Verarbeite den Chunk wie benötigt...
-                UIBackgroundCommunication.runs = UIBackgroundCommunication.runs.concat(request.data);
+                UIBackgroundCommunication.chunkedRuns = UIBackgroundCommunication.chunkedRuns.concat(request.data);
 
                 // Bestätige den Empfang des Chunks
                 sendResponse({ msg: 'chunk_received' });
@@ -321,7 +320,9 @@ class UIBackgroundCommunication {
             console.log("loadRuns(), vor dem if", msg, result);
             if (msg === 'allChunksSend') {
                 //globalArrayOfRuns = result;
-                console.log("loadRuns(), msg === allChunksSend, UIBackgroundCommunication.runs:", UIBackgroundCommunication.runs);
+                console.log("loadRuns(), msg === allChunksSend, UIBackgroundCommunication.runs:", UIBackgroundCommunication.chunkedRuns);
+                UIBackgroundCommunication.runs = UIBackgroundCommunication.chunkedRuns;
+                UIBackgroundCommunication.chunkedRuns = [];
                 g_UIRuns = buildArrayOfUIRuns(UIBackgroundCommunication.runs);
                 g_UIRuns.sort(sortUIRunsDesc);
                 console.log("loadRuns(), success", g_UIRuns);
@@ -335,7 +336,8 @@ class UIBackgroundCommunication {
     static exportRuns() {
         chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
             if (msg === 'allChunksSend') {
-                console.info(JSON.stringify(UIBackgroundCommunication.runs));
+                UIBackgroundCommunication.runs = UIBackgroundCommunication.chunkedRuns;
+                UIBackgroundCommunication.chunkedRuns = [];
             } else {
                 console.log(msg);
             }
