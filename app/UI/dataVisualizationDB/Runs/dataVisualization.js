@@ -27,9 +27,9 @@ class Season {
         this.mainGodDisplayName = mainGodDisplayName;
         this.godRarity = godRarity;
 
-        this.startDate = new Date(seasonStartDate+"T"+seasonStartTime).getTime();
+        this.startDate = new Date(seasonStartDate + "T" + seasonStartTime).getTime();
 
-        this.endDate = seasonEndDate === "" ? "" : new Date(seasonEndDate+"T"+seasonEndTime).getTime();
+        this.endDate = seasonEndDate === "" ? "" : new Date(seasonEndDate + "T" + seasonEndTime).getTime();
 
         this.horseAltName1 = horseAltName1;
         this.horseAltName2 = horseAltName2;
@@ -50,8 +50,74 @@ class Season {
         return JSON.stringify(this);
     }
 }
+class UIBackgroundCommunication {
+    static chunkedRuns = [];
+    static registerChunkReciever() {
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.type === "data_chunk") {
+                // Verarbeite den Chunk wie benötigt...
+                UIBackgroundCommunication.chunkedRuns = UIBackgroundCommunication.chunkedRuns.concat(request.data);
 
+                // Bestätige den Empfang des Chunks
+                sendResponse({ msg: 'chunk_received' });
+            }
+        });
+    }
+    /**
+     * Lädt alle Runs aus der Datenbank über eine Chrome Runtime Message.
+     * 
+     * Die Methode sendet eine Nachricht an den Background-Service und wartet auf
+     * die Antwort mit allen zusammengesammelten Runs. Nach erfolgreichem Laden
+     * wird das `chunkedRuns` Array geleert.
+     * 
+     * @returns {Promise<Array>} Ein Promise, das sich mit einem Array aller Runs auflöst.
+     *                            Bei Fehler wird das Promise mit einer Error abgelehnt.
+     * 
+     * @throws {Error} Wenn die Nachricht vom Background nicht mit 'allChunksSend' antwortet.
+     * 
+     * @example
+     * // Runs laden und verarbeiten
+     * UIBackgroundCommunication.loadRuns()
+     *     .then(runs => {
+     *         console.log("Runs geladen:", runs);
+     *         UIBackgroundCommunication.processRuns(runs);
+     *     })
+     *     .catch(error => console.error("Fehler beim Laden:", error));
+     * 
+     * @example
+     * // Mit async/await
+     * const runs = await UIBackgroundCommunication.loadRuns();
+     */
+    static loadRuns() {
+        console.log("am Anfang von loadRuns()");
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
+                console.log("loadRuns(), vor dem if", msg, result);
+                if (msg === 'allChunksSend') {
+                    let allRuns = UIBackgroundCommunication.chunkedRuns;
+                    UIBackgroundCommunication.chunkedRuns = [];
+                    resolve(allRuns);
+                } else {
+                    console.log("loadRuns(), else", msg);
+                    reject(new Error("Fehler beim Laden der Runs"));
+                }
+            });
+        });
+    }
+    static exportRuns() {
+        chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
+            if (msg === 'allChunksSend') {
+                UIBackgroundCommunication.runs = UIBackgroundCommunication.chunkedRuns;
+                UIBackgroundCommunication.chunkedRuns = [];
+            } else {
+                console.log(msg);
+            }
+
+        });
+    }
+}
 class UIInterface {
+    static runs;
     static registerLiveFilter() {
         document.getElementById("filterInput").addEventListener("input", filterUIRuns);
     }
@@ -92,12 +158,32 @@ class UIInterface {
             console.log(selectetdSeasons);
         })
     }
+
+    static initializeRuns() {
+        UIBackgroundCommunication.loadRuns()
+            .then(runs => {
+                UIInterface.runs = runs;
+
+
+                UIInterface.UIRuns = buildArrayOfUIRuns(runs);
+                UIInterface.UIRuns.sort(sortUIRunsDesc);
+
+                console.log("processRuns(), success", UIInterface.UIRuns);
+                buildTableForUIRuns(UIInterface.UIRuns);
+                calculateAverage();
+            })
+            .catch(error => console.error("Fehler:", error));
+
+    }
 }
+
+UIBackgroundCommunication.registerChunkReciever();
 UIInterface.registerLiveFilter();
 UIInterface.registerColumnSort();
 UIInterface.registerMousoverTooltip();
 UIInterface.registerOpenRun();
 UIInterface.registerLoadRunsBySeason();
+UIInterface.initializeRuns();
 
 function filterUIRuns() {
     let uIRunFilters = [{//jeder Filter kann genau einen Filter einer art enthalten
@@ -142,7 +228,7 @@ function filterUIRuns() {
     });
 
 
-    filteredUIRuns = g_UIRuns.filter((uIRun) => {
+    filteredUIRuns = UIInterface.UIRuns.filter((uIRun) => {
         return uIRunFilters.every(filter => {
             switch (filter.filterType) {
                 case "":
@@ -286,67 +372,20 @@ let asc = true;
 function sortUIRuns(collumToSort) {
     if (collumToSort == g_collumToSort && asc) {
         asc = false;
-        g_UIRuns.sort(sortUIRunsAsc);
+        UIInterface.UIRuns.sort(sortUIRunsAsc);
 
     } else {
         g_collumToSort = collumToSort;
-        g_UIRuns.sort(sortUIRunsDesc);
+        UIInterface.UIRuns.sort(sortUIRunsDesc);
         asc = true
     }
 
 
-    buildTableForUIRuns(g_UIRuns);
+    buildTableForUIRuns(UIInterface.UIRuns);
 
 }
 
-class UIBackgroundCommunication {
-    static runs = [];
-    static chunkedRuns = [];
-    static registerChunkReciever() {
-        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            if (request.type === "data_chunk") {
-                // Verarbeite den Chunk wie benötigt...
-                UIBackgroundCommunication.chunkedRuns = UIBackgroundCommunication.chunkedRuns.concat(request.data);
 
-                // Bestätige den Empfang des Chunks
-                sendResponse({ msg: 'chunk_received' });
-            }
-        });
-    }
-
-    static loadRuns() {
-        console.log("am Anfang von loadRuns()");
-        chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
-            console.log("loadRuns(), vor dem if", msg, result);
-            if (msg === 'allChunksSend') {
-                //globalArrayOfRuns = result;
-                console.log("loadRuns(), msg === allChunksSend, UIBackgroundCommunication.runs:", UIBackgroundCommunication.chunkedRuns);
-                UIBackgroundCommunication.runs = UIBackgroundCommunication.chunkedRuns;
-                UIBackgroundCommunication.chunkedRuns = [];
-                g_UIRuns = buildArrayOfUIRuns(UIBackgroundCommunication.runs);
-                g_UIRuns.sort(sortUIRunsDesc);
-                console.log("loadRuns(), success", g_UIRuns);
-                buildTableForUIRuns(g_UIRuns);
-                calculateAverage();
-            } else {
-                console.log("loadRuns(), else", msg);
-            }
-        });
-    }
-    static exportRuns() {
-        chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
-            if (msg === 'allChunksSend') {
-                UIBackgroundCommunication.runs = UIBackgroundCommunication.chunkedRuns;
-                UIBackgroundCommunication.chunkedRuns = [];
-            } else {
-                console.log(msg);
-            }
-
-        });
-    }
-}
-UIBackgroundCommunication.registerChunkReciever();
-UIBackgroundCommunication.loadRuns();
 
 
 function sortUIRunsAsc(a, b) {
@@ -360,9 +399,7 @@ function sortUIRunsDesc(a, b) {
     return sortUIRunsAsc(a, b) * -1;
 }
 
-let globalArrayOfRuns = [];
-let g_UIRuns = [];
-//loadSeasons();
+
 
 
 
@@ -582,11 +619,11 @@ function compareVersions() {
             console.log(arrayOfRunsOrgVersion);
 
             arrayOfRunsOrgVersion.sort(sortByDate);
-            g_UIRuns.sort(sortUIRunsDesc);
+            UIInterface.UIRuns.sort(sortUIRunsDesc);
 
             let orgIndex = 0;
-            for (let index = 0; index < g_UIRuns.length; index++) {
-                let run = g_UIRuns[index];
+            for (let index = 0; index < UIInterface.UIRuns.length; index++) {
+                let run = UIInterface.UIRuns[index];
                 let runOrg = arrayOfRunsOrgVersion[orgIndex];
                 while (new Date(run.id) < new Date(runOrg.dateRunStarted)) {
                     orgIndex++;

@@ -649,5 +649,9 @@ class HowrseDataSchemaSorter {
     }
 }
 
+class DataIOManager {
+    
+}
+
 
 
