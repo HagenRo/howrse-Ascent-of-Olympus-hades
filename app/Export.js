@@ -1,7 +1,7 @@
 class HowrseDataCompressor {
     // Schemata definieren die Feldordnung
     static SCHEMAS = {
-        root: ['arrayOfFights', 'arrayOfRewards', 'dateRunStarted', 'domain', 'drachma', 'startHorses'],
+        root: ['dateRunStarted', 'domain', 'drachma', 'startHorses', 'arrayOfFights', 'arrayOfRewards'],
         horse: ['currentlevel', 'currentstamina', 'id', 'levelmax', 'name', 'rewardType', 'skilla', 'skillb', 'skillc', 'skilld'],
         fight: ['arraySelectedHorseIds', 'difficulty', 'room', 'skillA', 'skillB', 'skillC', 'skillD', 'threshold', 'winrate'],
 
@@ -157,16 +157,9 @@ class HowrseDataCompressor {
 
 
 function testAll() {
-    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
-        if (msg === 'allChunksSend') {
-            UIBackgroundCommunication.runs = UIBackgroundCommunication.chunkedRuns;
-            UIBackgroundCommunication.chunkedRuns = [];
-
-            console.log(testEncodeDecode(UIBackgroundCommunication.runs));
-        } else {
-            console.log(msg);
-        }
-
+    UIBackgroundCommunication.loadRuns().then(runs => {
+        console.log("Runs geladen:", runs);
+        console.log(testEncodeDecode(UIBackgroundCommunication.runs));
     });
 }
 
@@ -650,8 +643,44 @@ class HowrseDataSchemaSorter {
 }
 
 class DataIOManager {
-    
+
+    static async exportAllRuns() {
+        UIBackgroundCommunication.loadRuns().then(runs => {
+            console.log("anzahl Runs:", runs.length);
+            let compressedRuns = DataIOManager._compressData(runs);
+            console.log(compressedRuns);
+
+        });
+    }
+
+
+    static _compressData(runs) {
+        const encoded1 = HowrseDataCompressor.compress(runs);
+        const encodedJSON = JSON.stringify(encoded1);
+        const encoded = DictionaryCompressor.compress(encodedJSON);
+        return JSON.stringify(encoded)
+    }
+    static _decompressData(data) {
+        const decoded1 = DictionaryCompressor.decompress(JSON.parse(data));
+        const decodedObject = JSON.parse(decoded1);
+        const runs = HowrseDataCompressor.decompress(decodedObject);
+        return runs
+    }
+
+
+
+    static async importData(data) {
+        let runs = DataIOManager._decompressData(data);
+
+        for (let olympRun of runs) {
+            chrome.runtime.sendMessage({ mdText: "addRunToDB", olympRun: olympRun }, (response) => {
+                console.log(response);
+            });
+        }
+    }
+
 }
+
 
 
 
