@@ -16,14 +16,14 @@ function OlympRunLogging(dateRunStarted, domain, drachma, startHorses = []) {
 /**Creates an instance of RewardsForLog.
 @param {number} threshold - The threshold the rewards are from.
 @param {string} room - The room the rewards are from.
-@param {number} dificulty - The difficulty level of the room.
+@param {number} difficulty - The difficulty level of the room.
 @param {Array} arrayOfRewards - An array of rewards (Horse, Booster, LevelUp, StaminaRefill).
 @param {number} fragments - Number of fragment earnd.
 @param {string} horse - The horse for which the frangments are. */
-function RewardsForLog(threshold, room, dificulty, arrayOfRewards, fragments, horse) {
+function RewardsForLog(threshold, room, difficulty, arrayOfRewards, fragments, horse) {
     this.threshold = threshold;
     this.room = room;
-    this.dificulty = dificulty;
+    this.difficulty = difficulty;
     this.arrayOfRewards = arrayOfRewards;
     this.fragments = fragments;
     this.horse = horse;
@@ -81,12 +81,12 @@ function Booster(dataSkillA, dataSkillB, dataSkillC, dataSkillD, arrayOfTargetId
         this.skill = 'D';
     }
 }
-/**Creates an instance of StaminRefill.
+/**Creates an instance of StaminaRefill.
 @param {number} numberStamina - The number of staminas to refill.
 @param {number} numberHorses - The number of horses to refill stamina for.
 @param {string[]} arrayOfTargetIds - The array of target IDs for which to refill stamina.
 @property {string} rewardType = 'StaminaRifill' */
-function StaminRefill(numberStamina, numberHorses, arrayOfTargetIds) {
+function StaminaRefill(numberStamina, numberHorses, arrayOfTargetIds) {
     this.rewardType = 'StaminaRefill';
     this.numberStamina = numberStamina;
     this.numberHorses = numberHorses;
@@ -225,7 +225,7 @@ function saveRewardForLogging() {
                         arrayOfTargetIdsS[index] = element.getAttribute('data-cardid');
                     }
                 }
-                rewardOptionsArray[index] = new StaminRefill(numberStamina, numberHorsesS, arrayOfTargetIdsS);
+                rewardOptionsArray[index] = new StaminaRefill(numberStamina, numberHorsesS, arrayOfTargetIdsS);
                 break;
             default:
                 break;
@@ -406,7 +406,7 @@ class OL_Extractor {
                 let id = $('.js-rowguecard--bonusnewanimation')?.[0]?.getAttribute('data-cardid');
                 //console.log('id: ', id);
                 if (id) {
-                    dateRunStarted = window.localStorage.getItem('OL_dateRunStarted');
+                    let dateRunStarted = window.localStorage.getItem('OL_dateRunStarted');
                     chrome.runtime.sendMessage({ mdText: "addHorseIdToReward", horseID: id, dateRunStarted: dateRunStarted }, (response) => {
                         console.log(response);
                     });
@@ -425,7 +425,7 @@ class OL_Extractor {
                     firstTime = false;
                 } else if (lose == 1) {
 
-                    dateRunStarted = window.localStorage.getItem('OL_dateRunStarted');
+                    let dateRunStarted = window.localStorage.getItem('OL_dateRunStarted');
                     chrome.runtime.sendMessage({ mdText: "addLostRunToBossRewards", dateRunStarted: dateRunStarted }, (response) => {
                         console.log(response);
                     });

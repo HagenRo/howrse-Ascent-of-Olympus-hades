@@ -661,7 +661,7 @@ class DataIOManager {
         return JSON.stringify(encoded)
     }
     static _decompressData(data) {
-        const decoded1 = DictionaryCompressor.decompress(JSON.parse(data));
+        const decoded1 = DictionaryCompressor.decompress(data);
         const decodedObject = JSON.parse(decoded1);
         const runs = HowrseDataCompressor.decompress(decodedObject);
         return runs
