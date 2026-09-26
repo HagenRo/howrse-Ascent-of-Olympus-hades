@@ -1,7 +1,7 @@
 class HowrseDataCompressor {
     // Schemata definieren die Feldordnung
     static SCHEMAS = {
-        root: ['arrayOfFights', 'arrayOfRewards', 'dateRunStarted', 'domain', 'drachma', 'startHorses'],
+        root: ['dateRunStarted', 'domain', 'drachma', 'startHorses', 'arrayOfFights', 'arrayOfRewards'],
         horse: ['currentlevel', 'currentstamina', 'id', 'levelmax', 'name', 'rewardType', 'skilla', 'skillb', 'skillc', 'skilld'],
         fight: ['arraySelectedHorseIds', 'difficulty', 'room', 'skillA', 'skillB', 'skillC', 'skillD', 'threshold', 'winrate'],
 
