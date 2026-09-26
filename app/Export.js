@@ -639,5 +639,47 @@ class HowrseDataSchemaSorter {
     }
 }
 
+class DataIOManager {
+
+    static async exportAllRunsNew() {
+            console.log("anzahl Runs:", g_result.length);
+            let compressedRuns = DataIOManager._compressData(g_result);
+            console.log(compressedRuns);
+
+    }
+    static async exportAllRunsOld() {
+            let compressedRuns = DataIOManager._compressData(globalArrayOfRuns);
+            console.log(compressedRuns);
+
+    }
+
+
+
+    static _compressData(runs) {
+        const encoded1 = HowrseDataCompressor.compress(runs);
+        const encodedJSON = JSON.stringify(encoded1);
+        const encoded = DictionaryCompressor.compress(encodedJSON);
+        return JSON.stringify(encoded)
+    }
+    static _decompressData(data) {
+        const decoded1 = DictionaryCompressor.decompress(JSON.parse(data));
+        const decodedObject = JSON.parse(decoded1);
+        const runs = HowrseDataCompressor.decompress(decodedObject);
+        return runs
+    }
+
+
+
+    static async importData(data) {
+        let runs = DataIOManager._decompressData(data);
+
+        for (let olympRun of runs) {
+            chrome.runtime.sendMessage({ mdText: "addRunToDB", olympRun: olympRun }, (response) => {
+                console.log(response);
+            });
+        }
+    }
+
+}
 
 
